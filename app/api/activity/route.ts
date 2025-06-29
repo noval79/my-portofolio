@@ -28,8 +28,21 @@ export async function POST(req: Request) {
   }
 }
 export async function DELETE(req: Request) {
-  const { id } = await req.json();
-  await connectDB();
-  await Activity.findByIdAndDelete(id);
-  return NextResponse.json({ message: "Activity deleted" });
+  try {
+    const { id } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ message: "ID tidak ditemukan" }, { status: 400 });
+    }
+
+    await connectDB();
+    await Activity.findByIdAndDelete(id);
+
+    return NextResponse.json({ message: "Activity deleted" });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: "DELETE failed", error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ message: "DELETE failed", error: "Unknown error" }, { status: 500 });
+  }
 }

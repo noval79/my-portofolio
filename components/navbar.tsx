@@ -1,12 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
-  const pathname = usePathname();
-
-  const isAdminPage = pathname.startsWith('/admin');
 
   return (
     <nav className="bg-white shadow sticky top-0 z-50">
@@ -20,7 +16,7 @@ export default function Navbar() {
         {/* Menu kanan */}
         <div className="space-x-4">
           <Link href="/" className="text-gray-700 hover:text-indigo-600 font-medium">| Home </Link>
-          <Link href="/article" className="text-gray-700 hover:text-indigo-600 font-medium">| Article </Link>
+          <Link href="/articles" className="text-gray-700 hover:text-indigo-600 font-medium">| Article </Link>
           <Link href="/contact" className="text-gray-700 hover:text-indigo-600 font-medium">| Contact Me</Link>
           <Link href="/admin" className="text-gray-700 hover:text-indigo-600 font-medium">| Admin |</Link>
         </div>

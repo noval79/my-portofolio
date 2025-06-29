@@ -300,7 +300,7 @@ export default function HomeClient() {
 <div id="activity" className="mt-20 max-w-5xl mx-auto text-center">
   <h2 className="text-3xl font-bold text-indigo-600 mb-4">Activity</h2>
   <p className="text-gray-600 mb-10 px-4 sm:px-0">
-    Some of the activities I've done, showing my passion for creativity, learning, and collaboration.
+    Some of the activities I&#39;ve&#39; done, showing my passion for creativity, learning, and collaboration.
   </p>
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
     {activity.map((item) => (

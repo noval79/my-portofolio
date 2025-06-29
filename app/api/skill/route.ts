@@ -20,9 +20,14 @@ export async function POST(req: Request) {
     await connectDB();
     const created = await Skill.create({ nama, deskripsi, gambar });
     return NextResponse.json(created);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("POST Error:", error);
-    return NextResponse.json({ message: "POST failed", error: error.message }, { status: 500 });
+
+    if (error instanceof Error) {
+      return NextResponse.json({ message: "POST failed", error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ message: "POST failed", error: "Unknown error" }, { status: 500 });
   }
 }
 
@@ -32,8 +37,13 @@ export async function DELETE(req: Request) {
     await connectDB();
     await Skill.findByIdAndDelete(id);
     return NextResponse.json({ message: 'Skill deleted' });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("DELETE Error:", error);
-    return NextResponse.json({ message: 'DELETE failed', error: error.message }, { status: 500 });
+
+    if (error instanceof Error) {
+      return NextResponse.json({ message: 'DELETE failed', error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ message: 'DELETE failed', error: 'Unknown error' }, { status: 500 });
   }
 }
