@@ -5,10 +5,19 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
 async function getArticles() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/article`, {
-    cache: 'no-store'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+  const res = await fetch(`${baseUrl}/api/article`, {
+    cache: 'no-store',
   });
-  return res.json();
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("API ERROR RESPONSE:", text); // debug
+    throw new Error("Failed to fetch articles");
+  }
+
+  return res.json(); // Pastikan JSON valid
 }
 
 export default async function ArticlePage() {

@@ -4,33 +4,51 @@ import mongoose from 'mongoose';
 const MONGODB_URI = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI is not defined in .env.local");
+  throw new Error("❌ MONGODB_URI is not defined in .env.local");
 }
 
-let cached = (global as any).mongoose || { conn: null, promise: null };
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
+
+// ✅ Gunakan globalThis untuk menghindari reinitialisasi di hot reload
+declare global {
+  var mongooseCache: MongooseCache | undefined;
+}
+
+const globalWithCache = globalThis as typeof globalThis & {
+  mongooseCache?: MongooseCache;
+};
+
+const cached = globalWithCache.mongooseCache || {
+  conn: null,
+  promise: null,
+};
 
 async function connectDB() {
   if (cached.conn) {
-    console.log("MongoDB: Using cached connection.");
+    console.log("✅ MongoDB: Using cached connection.");
     return cached.conn;
   }
 
   if (!cached.promise) {
-    const opts = {
+    console.log("🔌 MongoDB: Connecting...");
+    cached.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log("MongoDB: Successfully connected!");
+    }).then((mongoose) => {
+      console.log("✅ MongoDB: Connected successfully!");
       return mongoose;
-    }).catch((error) => {
-      console.error("MongoDB: Connection failed!", error);
-      cached.promise = null; // Reset promise on failure
-      throw error; // Re-throw to propagate the error
+    }).catch((err) => {
+      console.error("❌ MongoDB: Connection failed!", err);
+      cached.promise = null;
+      throw err;
     });
   }
 
   cached.conn = await cached.promise;
+  globalWithCache.mongooseCache = cached;
+
   return cached.conn;
 }
 

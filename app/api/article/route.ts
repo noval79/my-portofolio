@@ -4,9 +4,14 @@ import connectMongo from '@/lib/mongodb';
 import Article from '@/models/article';
 
 export async function GET() {
-  await connectMongo();
-  const articles = await Article.find();
-  return NextResponse.json(articles);
+  try {
+    await connectMongo();
+    const articles = await Article.find(); // misalnya ini data Mongo
+    return NextResponse.json(articles);
+  } catch (err) {
+    console.error('[GET /api/articles] Error:', err);
+    return NextResponse.json({ error: 'Failed to fetch articles' }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {

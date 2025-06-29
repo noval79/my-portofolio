@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function AdminSidebar() {
   return (
-    <aside className="w-48 min-h-screen p-4 bg-gray-100">
+    <aside className="w-48 min-h-screen p-4 bg-gray-100 text-black">
       <h2 className="text-lg font-bold mb-4">Admin Panel</h2>
       <nav className="flex flex-col space-y-2">
         <Link href="/admin">Dashboard</Link>
