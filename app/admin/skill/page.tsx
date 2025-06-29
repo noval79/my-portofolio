@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import Image from 'next/image'; // ✅ WAJIB agar <Image /> tidak error
 
 type SkillType = {
   _id: string;
@@ -21,8 +22,12 @@ export default function AdminSkillPage() {
   }, []);
 
   const fetchSkills = async () => {
-    const res = await axios.get('/api/skill');
-    setSkillList(res.data);
+    try {
+      const res = await axios.get('/api/skill');
+      setSkillList(res.data);
+    } catch (err) {
+      console.error('Gagal memuat data skill:', err);
+    }
   };
 
   const handleUploadGambar = async (file: File) => {
@@ -53,16 +58,26 @@ export default function AdminSkillPage() {
       return;
     }
 
-    await axios.post('/api/skill', form);
-    setForm({ nama: '', deskripsi: '', gambar: '' });
-    fetchSkills();
+    try {
+      await axios.post('/api/skill', form);
+      setForm({ nama: '', deskripsi: '', gambar: '' });
+      fetchSkills();
+    } catch (err) {
+      alert('Gagal menyimpan skill.');
+      console.error(err);
+    }
   };
 
   const handleDelete = async (id: string) => {
     const confirmDelete = confirm('Yakin ingin menghapus skill ini?');
     if (!confirmDelete) return;
-    await axios.delete('/api/skill', { data: { id } });
-    fetchSkills();
+
+    try {
+      await axios.delete('/api/skill', { data: { id } });
+      fetchSkills();
+    } catch (err) {
+      console.error('Gagal menghapus skill:', err);
+    }
   };
 
   return (
@@ -109,7 +124,15 @@ export default function AdminSkillPage() {
           {uploading && <p className="text-sm text-blue-500">Mengunggah gambar...</p>}
 
           {form.gambar && (
-            <img src={form.gambar} alt="Preview" className="w-32 mt-2 rounded border" />
+            <div className="w-32 mt-2 rounded border overflow-hidden">
+              <Image
+                src={form.gambar}
+                alt="Preview"
+                width={128}
+                height={128}
+                className="rounded"
+              />
+            </div>
           )}
 
           <button
@@ -132,11 +155,15 @@ export default function AdminSkillPage() {
                 <p className="font-semibold">{skill.nama}</p>
                 <p className="text-sm text-gray-600">{skill.deskripsi}</p>
                 {skill.gambar && (
-                  <img
-                    src={skill.gambar}
-                    alt={skill.nama}
-                    className="w-32 mt-2 rounded"
-                  />
+                  <div className="w-32 mt-2 rounded overflow-hidden">
+                    <Image
+                      src={skill.gambar}
+                      alt={skill.nama}
+                      width={128}
+                      height={128}
+                      className="rounded"
+                    />
+                  </div>
                 )}
               </div>
               <button

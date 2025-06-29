@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import Image from 'next/image'; // ✅ WAJIB agar Image bisa digunakan tanpa error
 
 type ProjekType = {
   _id: string;
@@ -20,8 +21,12 @@ export default function AdminProjekPage() {
   }, []);
 
   const fetchProjek = async () => {
-    const res = await axios.get('/api/projek');
-    setProjekList(res.data);
+    try {
+      const res = await axios.get('/api/projek');
+      setProjekList(res.data);
+    } catch (error) {
+      console.error('Gagal mengambil data projek:', error);
+    }
   };
 
   const handleUploadGambar = async (file: File) => {
@@ -29,35 +34,47 @@ export default function AdminProjekPage() {
     formData.append("file", file);
     formData.append("upload_preset", "portofolio");
 
-    const res = await fetch("https://api.cloudinary.com/v1_1/dy6i7ksuc/image/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("https://api.cloudinary.com/v1_1/dy6i7ksuc/image/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
-    setForm({ ...form, gambar: data.secure_url });
+      const data = await res.json();
+      setForm({ ...form, gambar: data.secure_url });
+    } catch (error) {
+      console.error('Gagal mengupload gambar:', error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!form.gambar) {
-      alert("Gambar belum diupload!");
+      alert("Tunggu sampai gambar selesai di-upload!");
       return;
     }
 
-    await axios.post('/api/projek', form);
-    alert('Projek berhasil ditambahkan!');
-    setForm({ nama: '', deskripsi: '', gambar: '' });
-    fetchProjek();
+    try {
+      await axios.post('/api/projek', form);
+      alert('Projek berhasil ditambahkan!');
+      setForm({ nama: '', deskripsi: '', gambar: '' });
+      fetchProjek();
+    } catch (error) {
+      console.error('Gagal menambahkan projek:', error);
+    }
   };
 
   const handleDelete = async (id: string) => {
     const confirmDelete = confirm('Yakin ingin menghapus projek ini?');
     if (!confirmDelete) return;
 
-    await axios.delete('/api/projek', { data: { id } });
-    fetchProjek();
+    try {
+      await axios.delete('/api/projek', { data: { id } });
+      fetchProjek();
+    } catch (error) {
+      console.error('Gagal menghapus projek:', error);
+    }
   };
 
   return (
@@ -114,7 +131,15 @@ export default function AdminProjekPage() {
                 <p className="font-semibold">{projek.nama}</p>
                 <p className="text-sm text-gray-600">{projek.deskripsi}</p>
                 {projek.gambar && (
-                  <img src={projek.gambar} alt={projek.nama} className="w-40 mt-2 rounded" />
+                  <div className="w-40 mt-2 overflow-hidden rounded">
+                    <Image
+                      src={projek.gambar}
+                      alt={projek.nama}
+                      width={160}
+                      height={90}
+                      className="rounded"
+                    />
+                  </div>
                 )}
               </div>
               <button

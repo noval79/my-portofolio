@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import Image from 'next/image'; // ✅ Tambahkan untuk menghindari error
 
 type OrganisasiType = {
   _id: string;
@@ -21,8 +22,12 @@ export default function AdminOrganisasiPage() {
   }, []);
 
   const fetchOrganisasi = async () => {
-    const res = await axios.get('/api/organisasi');
-    setOrganisasiList(res.data);
+    try {
+      const res = await axios.get('/api/organisasi');
+      setOrganisasiList(res.data);
+    } catch (error) {
+      console.error('Gagal mengambil data organisasi:', error);
+    }
   };
 
   const handleUploadGambar = async (file: File) => {
@@ -30,13 +35,17 @@ export default function AdminOrganisasiPage() {
     formData.append("file", file);
     formData.append("upload_preset", "portofolio");
 
-    const res = await fetch("https://api.cloudinary.com/v1_1/dy6i7ksuc/image/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("https://api.cloudinary.com/v1_1/dy6i7ksuc/image/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
-    setForm({ ...form, gambar: data.secure_url });
+      const data = await res.json();
+      setForm({ ...form, gambar: data.secure_url });
+    } catch (error) {
+      console.error("Gagal upload gambar:", error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -47,18 +56,26 @@ export default function AdminOrganisasiPage() {
       return;
     }
 
-    await axios.post('/api/organisasi', form);
-    alert('Organisasi berhasil ditambahkan!');
-    setForm({ nama: '', tahun: '', deskripsi: '', gambar: '' });
-    fetchOrganisasi();
+    try {
+      await axios.post('/api/organisasi', form);
+      alert('Organisasi berhasil ditambahkan!');
+      setForm({ nama: '', tahun: '', deskripsi: '', gambar: '' });
+      fetchOrganisasi();
+    } catch (error) {
+      console.error("Gagal menambahkan data organisasi:", error);
+    }
   };
 
   const handleDelete = async (id: string) => {
     const confirmDelete = confirm('Yakin ingin menghapus data ini?');
     if (!confirmDelete) return;
 
-    await axios.delete('/api/organisasi', { data: { id } });
-    fetchOrganisasi();
+    try {
+      await axios.delete('/api/organisasi', { data: { id } });
+      fetchOrganisasi();
+    } catch (error) {
+      console.error("Gagal menghapus data:", error);
+    }
   };
 
   return (
@@ -120,7 +137,15 @@ export default function AdminOrganisasiPage() {
                 <p className="font-semibold">{item.nama} ({item.tahun})</p>
                 <p className="text-sm text-gray-600">{item.deskripsi}</p>
                 {item.gambar && (
-                  <img src={item.gambar} alt={item.nama} className="w-40 mt-2 rounded" />
+                  <div className="w-40 mt-2 rounded overflow-hidden">
+                    <Image
+                      src={item.gambar}
+                      alt={item.nama}
+                      width={160}
+                      height={90}
+                      className="rounded"
+                    />
+                  </div>
                 )}
               </div>
               <button

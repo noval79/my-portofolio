@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import Image from 'next/image'; // ✅ Diperlukan karena kita menggunakan <Image />
 
 type ExperienceType = {
   _id: string;
@@ -21,8 +22,12 @@ export default function AdminExperiencePage() {
   }, []);
 
   const fetchExperience = async () => {
-    const res = await axios.get('/api/experience');
-    setExperienceList(res.data);
+    try {
+      const res = await axios.get('/api/experience');
+      setExperienceList(res.data);
+    } catch (error) {
+      console.error('Gagal mengambil data pengalaman:', error);
+    }
   };
 
   const handleUploadGambar = async (file: File) => {
@@ -30,13 +35,17 @@ export default function AdminExperiencePage() {
     formData.append("file", file);
     formData.append("upload_preset", "portofolio");
 
-    const res = await fetch("https://api.cloudinary.com/v1_1/dy6i7ksuc/image/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("https://api.cloudinary.com/v1_1/dy6i7ksuc/image/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
-    setForm({ ...form, gambar: data.secure_url });
+      const data = await res.json();
+      setForm({ ...form, gambar: data.secure_url });
+    } catch (error) {
+      console.error('Upload gambar gagal:', error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -46,17 +55,26 @@ export default function AdminExperiencePage() {
       return;
     }
 
-    await axios.post('/api/experience', form);
-    alert('Pengalaman berhasil ditambahkan!');
-    setForm({ nama: '', tahun: '', deskripsi: '', gambar: '' });
-    fetchExperience();
+    try {
+      await axios.post('/api/experience', form);
+      alert('Pengalaman berhasil ditambahkan!');
+      setForm({ nama: '', tahun: '', deskripsi: '', gambar: '' });
+      fetchExperience();
+    } catch (error) {
+      console.error('Gagal menambahkan pengalaman:', error);
+    }
   };
 
   const handleDelete = async (id: string) => {
     const confirmDelete = confirm('Yakin ingin menghapus pengalaman ini?');
     if (!confirmDelete) return;
-    await axios.delete('/api/experience', { data: { id } });
-    fetchExperience();
+
+    try {
+      await axios.delete('/api/experience', { data: { id } });
+      fetchExperience();
+    } catch (error) {
+      console.error('Gagal menghapus pengalaman:', error);
+    }
   };
 
   return (
@@ -119,7 +137,15 @@ export default function AdminExperiencePage() {
                 <p className="font-semibold">{item.nama} ({item.tahun})</p>
                 <p className="text-sm text-gray-600">{item.deskripsi}</p>
                 {item.gambar && (
-                  <img src={item.gambar} alt={item.nama} className="w-40 mt-2 rounded" />
+                  <div className="w-40 mt-2 rounded overflow-hidden">
+                    <Image
+                      src={item.gambar}
+                      alt={item.nama}
+                      width={160}
+                      height={90}
+                      className="rounded"
+                    />
+                  </div>
                 )}
               </div>
               <button

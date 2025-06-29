@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import Image from 'next/image'; // ✅ Penting untuk digunakan karena kamu memakai <Image />
 
 type EducationType = {
   _id: string;
@@ -21,35 +22,51 @@ export default function AdminEducationPage() {
   }, []);
 
   const fetchEducation = async () => {
-    const res = await axios.get('/api/education');
-    setEducationList(res.data);
+    try {
+      const res = await axios.get('/api/education');
+      setEducationList(res.data);
+    } catch (error) {
+      console.error('Gagal mengambil data education:', error);
+    }
   };
 
   const handleUploadGambar = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "portofolio");
-    const res = await fetch("https://api.cloudinary.com/v1_1/dy6i7ksuc/image/upload", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    setForm({ ...form, gambar: data.secure_url });
+    try {
+      const res = await fetch("https://api.cloudinary.com/v1_1/dy6i7ksuc/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      setForm({ ...form, gambar: data.secure_url });
+    } catch (error) {
+      console.error('Gagal upload gambar:', error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await axios.post('/api/education', form);
-    alert('Education berhasil ditambahkan!');
-    setForm({ nama: '', tahun: '', deskripsi: '', gambar: '' });
-    fetchEducation();
+    try {
+      await axios.post('/api/education', form);
+      alert('Education berhasil ditambahkan!');
+      setForm({ nama: '', tahun: '', deskripsi: '', gambar: '' });
+      fetchEducation();
+    } catch (error) {
+      console.error('Gagal menambahkan education:', error);
+    }
   };
 
   const handleDelete = async (id: string) => {
     const confirmDelete = confirm('Yakin ingin menghapus data education ini?');
     if (!confirmDelete) return;
-    await axios.delete('/api/education', { data: { id } });
-    fetchEducation();
+    try {
+      await axios.delete('/api/education', { data: { id } });
+      fetchEducation();
+    } catch (error) {
+      console.error('Gagal menghapus education:', error);
+    }
   };
 
   return (
@@ -111,7 +128,15 @@ export default function AdminEducationPage() {
                 <p className="font-semibold">{edu.nama} ({edu.tahun})</p>
                 <p className="text-sm text-gray-600">{edu.deskripsi}</p>
                 {edu.gambar && (
-                  <img src={edu.gambar} alt={edu.nama} className="w-40 mt-2 rounded" />
+                  <div className="w-40 mt-2 rounded overflow-hidden">
+                    <Image
+                      src={edu.gambar}
+                      alt={edu.nama}
+                      width={160}
+                      height={90}
+                      className="rounded"
+                    />
+                  </div>
                 )}
               </div>
               <button
