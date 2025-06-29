@@ -164,10 +164,13 @@ export default function HomeClient() {
       <div key={item._id} className="bg-white border rounded-lg shadow-sm overflow-hidden">
         <div className="w-full h-48 bg-gray-100 relative">
           {item.gambar ? (
-  <img 
-  src={item.gambar} 
-  alt={item.nama} 
-   className="w-20 h-20 mx-auto mb-2 object-contain" />
+ <Image
+  src={item.gambar}
+  alt={item.nama}
+  width={100}
+  height={100}
+  className="w-20 h-20 mx-auto mb-2 object-contain"
+/>
           ) : (
             <div className="flex items-center justify-center w-full h-full text-gray-500">
               No Image
