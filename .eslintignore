@@ -1,0 +1,4 @@
+node_modules/
+build/
+app/api/upload/route.ts
+app/api/article/[id]/page.tsx
