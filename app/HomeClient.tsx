@@ -137,7 +137,14 @@ export default function HomeClient() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-left">
             {skills.map((skill) => (
               <div key={skill._id} className="p-4 border rounded text-center shadow-sm">
-                <img src={skill.gambar} alt={skill.nama} className="w-20 h-20 mx-auto mb-2 object-contain" />
+                <Image
+  src={skill.gambar}
+  alt={skill.nama}
+  width={80}
+  height={80}
+  className="mx-auto mb-2 object-contain"
+/>
+
                 <h3 className="text-lg font-semibold">{skill.nama}</h3>
                 <p className="text-sm text-gray-600">{skill.deskripsi}</p>
               </div>
@@ -157,7 +164,7 @@ export default function HomeClient() {
       <div key={item._id} className="bg-white border rounded-lg shadow-sm overflow-hidden">
         <div className="w-full h-48 bg-gray-100 relative">
           {item.gambar ? (
-  <img 
+  <Image 
   src={item.gambar} 
   alt={item.nama} 
    className="w-20 h-20 mx-auto mb-2 object-contain" />
@@ -188,7 +195,7 @@ export default function HomeClient() {
     {education.map((item) => (
       <div key={item._id} className="bg-white border rounded-lg shadow-sm overflow-hidden">
         {item.gambar ? (
-          <img 
+          <Image 
           src={item.gambar} 
           alt={item.nama} 
           className="w-20 h-20 mx-auto mb-2 object-contain" />
@@ -220,7 +227,7 @@ export default function HomeClient() {
       <div key={item._id} className="bg-white border rounded-lg shadow-sm overflow-hidden">
         <div className="w-full h-48 bg-gray-100 relative">
           {item.gambar ? (
-            <img 
+            <Image 
             src={item.gambar} 
             alt={item.nama} 
              className="w-20 h-20 mx-auto mb-2 object-contain" />
@@ -256,7 +263,7 @@ export default function HomeClient() {
       >
         <div className="w-full h-48 bg-gray-100 relative">
           {item.gambar ? (
-            <img
+            <Image
               src={item.gambar}
               alt={item.nama}
                className="w-20 h-20 mx-auto mb-2 object-contain"
@@ -289,18 +296,21 @@ export default function HomeClient() {
   </p>
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
     {activity.map((item) => (
-      <div key={item._id} className="bg-white border rounded-lg shadow-sm overflow-hidden">
-        <div className="w-full h-48 bg-gray-100 relative">
-          {item.gambar ? (
-            <img 
-            src={item.gambar} 
-            alt={item.nama} 
-             className="w-20 h-20 mx-auto mb-2 object-contain" />
-          ) : (
-            <div className="flex items-center justify-center w-full h-full text-gray-500">
-              No Image
-            </div>
-          )}
+  <div key={item._id} className="bg-white border rounded-lg shadow-sm overflow-hidden">
+    <div className="w-full h-48 bg-gray-100 relative">
+       {item.gambar ? (
+            <Image 
+              src={item.gambar} 
+              alt={item.nama} 
+              width={100}
+              height={100}
+              className="w-20 h-20 mx-auto mb-2 object-contain" 
+            />
+      ) : (
+        <div className="flex items-center justify-center w-full h-full text-gray-500">
+          No Image
+        </div>
+      )}
         </div>
         <div className="p-4 text-center">
           <h3 className="font-semibold text-lg text-gray-800">{item.nama}</h3>
