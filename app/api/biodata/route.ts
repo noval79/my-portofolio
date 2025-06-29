@@ -23,9 +23,12 @@ export async function POST(req: Request) {
 
     const created = await Biodata.create(body);
     return NextResponse.json(created);
-  } catch (error: any) {
-    console.error("POST Error:", error);
-    return NextResponse.json({ message: "POST failed", error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("POST Error:", error);
+      return NextResponse.json({ message: "POST failed", error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ message: "POST failed", error: "Unknown error" }, { status: 500 });
   }
 }
 
@@ -34,13 +37,18 @@ export async function DELETE(req: Request) {
   try {
     await connectDB();
     const body = await req.json();
-    const { id } = body;
+    const { id } = body as { id?: string };
 
-    if (!id) return NextResponse.json({ message: 'ID diperlukan' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ message: 'ID diperlukan' }, { status: 400 });
+    }
 
     await Biodata.findByIdAndDelete(id);
     return NextResponse.json({ message: 'Biodata dihapus' });
-  } catch (error: any) {
-    return NextResponse.json({ message: 'DELETE failed', error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: 'DELETE failed', error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ message: 'DELETE failed', error: 'Unknown error' }, { status: 500 });
   }
 }

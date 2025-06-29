@@ -10,11 +10,11 @@ cloudinary.config({
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
-    const file = formData.get('foto') as File;
+    const file = formData.get('foto');
 
-    if (!file) {
-      console.error("❌ Tidak ada file yang dikirim");
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    if (!file || !(file instanceof File)) {
+      console.error("❌ Tidak ada file yang dikirim atau file bukan tipe yang valid");
+      return NextResponse.json({ error: 'No valid file uploaded' }, { status: 400 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
@@ -28,16 +28,22 @@ export async function POST(req: Request) {
 
     console.log("✅ Cloudinary result:", result);
     return NextResponse.json({ url: result.secure_url });
-  } catch (err: any) {
-  console.error("❌ ERROR DI /api/upload");
-  console.error("Nama:", err?.name);
-  console.error("Pesan:", err?.message);
-  console.error("Stack:", err?.stack);
-  console.error("Response:", err?.response); // jika ada
-  return NextResponse.json(
-    { error: err?.message || 'Upload failed' },
-    { status: 500 }
-  );
-}
+  } catch (err: unknown) {
+    console.error("❌ ERROR DI /api/upload");
 
+    if (err instanceof Error) {
+      console.error("Nama:", err.name);
+      console.error("Pesan:", err.message);
+      console.error("Stack:", err.stack);
+      return NextResponse.json(
+        { error: err.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Upload failed with unknown error' },
+      { status: 500 }
+    );
+  }
 }

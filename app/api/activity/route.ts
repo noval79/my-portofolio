@@ -20,11 +20,13 @@ export async function POST(req: Request) {
     await connectDB();
     const created = await Activity.create({ nama, tahun, deskripsi, gambar });
     return NextResponse.json(created);
-  } catch (error: any) {
-    return NextResponse.json({ message: "POST failed", error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: "POST failed", error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ message: "POST failed", error: "Unknown error" }, { status: 500 });
   }
 }
-
 export async function DELETE(req: Request) {
   const { id } = await req.json();
   await connectDB();
